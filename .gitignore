@@ -1,0 +1,11 @@
+# Dépendances (Front & Back)
+**/node_modules
+
+# Build (Front & Back)
+**/dist
+**/.output
+**/.nuxt
+**/.nitro
+**/.cache
+
+

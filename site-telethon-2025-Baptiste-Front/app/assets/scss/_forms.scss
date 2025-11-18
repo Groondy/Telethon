@@ -1,0 +1,28 @@
+@use "variables" as *;
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $gray-700;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid $gray-300;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: $indigo-600;
+    box-shadow: 0 0 0 2px rgba($indigo-600, 0.3);
+  }
+}

@@ -1,0 +1,48 @@
+// Variables de couleur pour la cohérence
+$indigo-500: #6366f1;
+$indigo-600: #4f46e5;
+$indigo-700: #4338ca;
+$indigo-800: #3730a3;
+
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+$white: #ffffff;
+
+$red-500: #ef4444;
+$red-600: #dc2626;
+$red-800: #991b1b;
+
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+
+// Couleurs des équipes
+$team-colors: (
+  bleu: (
+    bg: #ebf8ff,
+    border: #bee3f8,
+    text: #2c5282,
+  ),
+  rouge: (
+    bg: #fff5f5,
+    border: #fed7d7,
+    text: #9b2c2c,
+  ),
+  vert: (
+    bg: #f0fff4,
+    border: #c6f6d5,
+    text: #276749,
+  ),
+  jaune: (
+    bg: #fffff0,
+    border: #fefcbf,
+    text: #975a16,
+  ),
+);

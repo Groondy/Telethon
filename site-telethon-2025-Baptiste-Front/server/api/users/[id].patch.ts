@@ -1,4 +1,3 @@
-
 export default defineEventHandler(async (event) => {
   // 1. Protéger la route
   await requireUserSession(event)
@@ -6,39 +5,42 @@ export default defineEventHandler(async (event) => {
   // 2. Récupérer le token de l'admin
   const session = await getUserSession(event)
   const token = session.token
+  
+  // On construit le nom complet de l'admin
+  const adminName = `${session.user.prenom} ${session.user.nom}`
 
   // 3. Récupérer l'ID de l'utilisateur et les points à ajouter
   const userId = getRouterParam(event, 'id')
   const body = await readBody(event)
-  const { points } = body
+  const { points, pointsAdded, itemName } = body
 
   if (!userId || points === undefined) {
-    throw createError({ statusCode: 400, statusMessage: 'ID utilisateur ou points manquants' })
+    throw createError({ 
+      statusCode: 400, 
+      message: 'ID utilisateur ou points manquants' 
+    })
   }
 
   try {
-    // 4. Appeler l'API externe pour mettre à jour les points
-    // On suppose que le backend attend un objet avec les points à ajouter
+    // 4. Appeler l'API externe (Backend Express sur le port 3001)
     const updatedUser = await $fetch(`http://localhost:3001/api/utilisateurs/${userId}/points`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      body: { points },
+      body: { points, pointsAdded, itemName, adminName },
     })
 
-    // Diffuser un message à tous les clients WebSocket connectés
-    event.node.res.websocket?.send(JSON.stringify({ type: 'scores-updated' }))
+    // C'est le backend (port 3001) qui envoie la notification automatiquement.
 
-
-    // 5. Renvoyer l'utilisateur mis à jour
     return updatedUser
   }
   catch (error: any) {
-    // 6. Gérer les erreurs
+    // 5. Gérer les erreurs proprement
     throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: error.data?.message || 'Une erreur est survenue lors de la mise à jour des points.',
+      // CORRECTION H3 : Utiliser 'message' au lieu de 'statusMessage'
+      message: error.data?.message || error.message || 'Une erreur est survenue lors de la mise à jour.',
     })
   }
 })

@@ -8,6 +8,7 @@ const {
   getTeamPoints,
   getAllItems,
   getTopPlayers,
+  getRecentLogs,
 } = require("./userController");
 const { authenticateToken } = require("./authMiddleware");
 
@@ -19,6 +20,7 @@ router.get("/", getAllUsers);
 router.get("/points/equipes", getTeamPoints);
 router.get("/items", getAllItems);
 router.get("/points/top10", getTopPlayers);
+router.get("/logs/recent", getRecentLogs);
 
 // --- Routes Protégées ---
 // Seuls les administrateurs authentifiés peuvent modifier les données.

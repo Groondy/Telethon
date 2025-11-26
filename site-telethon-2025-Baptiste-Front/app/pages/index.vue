@@ -37,7 +37,7 @@
         class="score-card"
         :class="`team-${score.couleur_equipe.toLowerCase()}`"
       >
-        <h3 class="team-name">Équipe {{ score.couleur_equipe }}</h3>
+        <h3 class="team-name">{{ teamNames[score.couleur_equipe] || score.couleur_equipe }}</h3>
         <p class="points">{{ score.total_points }}</p>
         <p class="points-label">points</p>
       </div>
@@ -78,7 +78,12 @@
 
 <script setup lang="ts">
 const { user, loggedIn, clear } = useUserSession();
-
+const teamNames: Record<string, string> = {
+  'Bleu': 'Les Légionnaires',
+  'Rouge': 'Les Charleston',
+  'Vert': 'Les Grrrrrrr',
+  'Jaune': 'Les Templiers'
+};
 // Interface pour les scores d'équipe (Existante)
 interface TeamScore {
   couleur_equipe: string;

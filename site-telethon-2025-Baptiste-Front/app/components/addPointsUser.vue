@@ -12,12 +12,8 @@
             Points actuels : {{ userPoints }}
           </p>
 
-          <div v-if="pending" class="loading-message">
-            Chargement des items...
-          </div>
-          <div v-else-if="error" class="error-message">
-            Erreur lors du chargement des items.
-          </div>
+          <div v-if="pending" class="loading-message">Chargement...</div>
+          <div v-else-if="error" class="error-message">Erreur chargement items.</div>
           <div v-else-if="items" class="items-grid">
             <button
               v-for="item in items.data"
@@ -33,13 +29,7 @@
           <p v-if="addError" class="error-message">{{ addError }}</p>
 
           <div class="modal-actions">
-            <button
-              type="button"
-              @click="closeModal"
-              class="btn btn-secondary"
-            >
-              Fermer
-            </button>
+            <button type="button" @click="closeModal" class="btn btn-secondary">Fermer</button>
           </div>
         </div>
       </div>
@@ -48,7 +38,6 @@
 </template>
 
 <script setup lang="ts">
-// MODIFIÉ ICI: Mettre à jour l'interface Item
 interface Item {
   id: number;
   nom: string;
@@ -70,7 +59,6 @@ const isModalOpen = ref(false);
 const loadingItem = ref<number | null>(null);
 const addError = ref<string | null>(null);
 
-// Récupérer les items (données pour les boutons)
 const { data: items, pending, error, refresh } = useFetch<{ data: Item[] }>('/api/items', {
   lazy: true,
   server: false,
@@ -80,16 +68,13 @@ const { data: items, pending, error, refresh } = useFetch<{ data: Item[] }>('/ap
 function openModal() {
   isModalOpen.value = true;
   addError.value = null;
-  if (!items.value) {
-    refresh(); 
-  }
+  if (!items.value) refresh(); 
 }
 
 function closeModal() {
   isModalOpen.value = false;
 }
 
-// Logique d'ajout de points
 async function handleAddPoints(item: Item) {
   if (loadingItem.value !== null) return; 
 
@@ -97,18 +82,27 @@ async function handleAddPoints(item: Item) {
   addError.value = null;
 
   try {
-    // MODIFIÉ ICI: item.points -> item.prix
-    const newTotalPoints = props.userPoints + item.prix;
+    // Sécurité : on force la conversion en nombre
+    const pointsToAdd = Number(item.prix);
+    
+    if (isNaN(pointsToAdd)) throw new Error("Le prix de l'item n'est pas un nombre valide");
+
+    const newTotalPoints = props.userPoints + pointsToAdd;
 
     await $fetch(`/api/users/${props.userId}`, {
       method: "PATCH",
-      body: { points: newTotalPoints },
+      body: { 
+        points: newTotalPoints, // Le nouveau total (pour la mise à jour)
+        pointsAdded: pointsToAdd, // Le montant ajouté (pour le log)
+        itemName: item.nom // Le nom de l'item (pour le log)
+      },
     });
     
     emit("pointsAdded");
     
   } catch (e: any) {
-    const errorMessage = e.data?.statusMessage || "Erreur lors de l'ajout des points.";
+    // On récupère le message d'erreur proprement
+    const errorMessage = e.data?.message || e.message || "Erreur lors de l'ajout des points.";
     addError.value = errorMessage;
     emit("error", errorMessage);
   } finally {
@@ -118,91 +112,22 @@ async function handleAddPoints(item: Item) {
 </script>
 
 <style scoped lang="scss">
-/* Les styles sont inchangés par rapport à ma réponse précédente */
 @use "~/assets/scss/variables" as *;
 @use "~/assets/scss/buttons";
 @use "~/assets/scss/forms";
 
-.btn-primary {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.875rem;
-}
-
-.modal-overlay {
-  z-index: 1000;
-  position: fixed;
-  inset: 0;
-  background-color: rgba($gray-600, 0.5);
-  overflow-y: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
-
-.modal-card {
-  position: relative;
-  margin: auto;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 32rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  border-radius: 0.375rem;
-  background-color: $white;
-}
-
-.modal-content {
-  text-align: left;
-}
-
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: $gray-900;
-  margin-bottom: 0.5rem;
-}
-
-.current-points {
-  font-size: 0.875rem;
-  color: $gray-600;
-  margin-bottom: 1.5rem;
-}
-
-.loading-message, .error-message {
-  text-align: center;
-  padding: 1rem;
-  color: $gray-600;
-}
-
-.error-message {
-  color: $red-500;
-  font-size: 0.875rem;
-  margin-top: 1rem;
-}
-
-.items-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.btn-item {
-  @extend .btn;
-  @extend .btn-secondary;
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 0.875rem;
-  
-  &:disabled {
-    opacity: 0.7;
-    cursor: wait;
-  }
-}
-
-.modal-actions {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: flex-end;
-}
+/* Vos styles existants... */
+.btn-primary { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+.modal-overlay { z-index: 1000; position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; padding: 1rem; }
+.modal-card { background: white; padding: 1.5rem; border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.modal-content { text-align: left; }
+.modal-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem; }
+.current-points { font-size: 0.875rem; color: #666; margin-bottom: 1.5rem; }
+.items-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+.btn-item { width: 100%; padding: 12px; background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+.btn-item:hover:not(:disabled) { background-color: #e5e7eb; }
+.btn-item:disabled { opacity: 0.7; cursor: wait; }
+.modal-actions { display: flex; justify-content: flex-end; }
+.error-message { color: #dc2626; margin-top: 10px; font-size: 0.875rem; text-align: center; }
+.loading-message { text-align: center; color: #666; padding: 1rem; }
 </style>

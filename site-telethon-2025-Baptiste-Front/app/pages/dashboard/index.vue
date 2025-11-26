@@ -8,6 +8,7 @@
         </p>
         <div class="user-actions">
           <NuxtLink to="/" class="btn btn-secondary">Accueil</NuxtLink>
+          <NuxtLink to="/dashboard/tele" class="btn btn-primary">Affichage Télé</NuxtLink>
           <button @click="handleLogout" class="btn btn-secondary">
             Se déconnecter
           </button>
@@ -28,15 +29,11 @@
           />
         </div>
         <div class="form-group">
-          <label for="colorFilter">Filtrer par couleur d'équipe :</label>
+          <label for="colorFilter">Filtrer par équipe :</label>
           <select v-model="selectedColor" id="colorFilter" class="form-control">
             <option value="">Toutes</option>
-            <option
-              v-for="color in availableColors"
-              :key="color"
-              :value="color"
-            >
-              {{ color }}
+            <option v-for="color in availableColors" :key="color" :value="color">
+              {{ teamNames[color] || color }}
             </option>
           </select>
         </div>
@@ -72,7 +69,7 @@
               <td>{{ user.id }}</td>
               <td>{{ user.prenom }}</td>
               <td>{{ user.nom }}</td>
-              <td>{{ user.couleur_equipe }}</td>
+              <td>{{ teamNames[user.couleur_equipe] || user.couleur_equipe }}</td>
               <td>{{ user.points }}</td>
               <td class="actions-cell">
                 <PatchUser
@@ -167,6 +164,13 @@ const searchQuery = ref("");
 const selectedColor = ref("");
 const currentPage = ref(1);
 const itemsPerPage = ref(10); // Nombre d'éléments par page
+
+const teamNames: Record<string, string> = {
+  'Bleu': 'Les Légionnaires',
+  'Rouge': 'Les Charleston',
+  'Vert': 'Les Grrrrrrr',
+  'Jaune': 'Les Templiers'
+};
 
 // Récupérer la liste des utilisateurs depuis notre API
 const {

@@ -85,40 +85,52 @@ const deleteUser = (req, res, next) => {
 
 const updateUserPoints = (req, res, next) => {
   const { id } = req.params;
-  const { points } = req.body;
+  // On récupère les infos pour le log
+  const { points, pointsAdded, itemName, adminName } = req.body;
 
-  // Validation: s'assurer que les points sont un nombre
   if (typeof points !== "number") {
-    return res
-      .status(400)
-      .json({ error: "Le champ 'points' doit être un nombre." });
+    return res.status(400).json({ error: "Le champ 'points' doit être un nombre." });
   }
 
-  const sql = `UPDATE utilisateurs SET points = ? WHERE id = ?`;
+  // 1. Mise à jour des points
+  const sqlUpdate = `UPDATE utilisateurs SET points = ? WHERE id = ?`;
 
-  db.run(sql, [points, id], function (err) {
-    if (err) {
-      return next(err);
-    }
-    if (this.changes === 0) {
-      return res.status(404).json({ message: "Utilisateur non trouvé." });
-    }
+  db.run(sqlUpdate, [points, id], function (err) {
+    if (err) return next(err);
+    if (this.changes === 0) return res.status(404).json({ message: "Utilisateur non trouvé." });
+
+    // 2. Récupérer les infos de l'utilisateur cible pour le log
+    db.get("SELECT nom, prenom FROM utilisateurs WHERE id = ?", [id], (err, targetUser) => {
+      if (err) {
+        console.error("Erreur récupération user pour log:", err);
+      } else if (targetUser && pointsAdded && itemName && adminName) {
+        
+        // 3. Création du log
+        const sqlLog = `INSERT INTO logs (prenom_cible, nom_cible, admin, item, montant) VALUES (?, ?, ?, ?, ?)`;
+        db.run(sqlLog, [
+          targetUser.prenom,
+          targetUser.nom,
+          adminName,
+          itemName,
+          pointsAdded
+        ], (logErr) => {
+          if (logErr) console.error("Erreur insertion log:", logErr);
+        });
+      }
+    });
+
     res.json({
-      message: `Points de l'utilisateur ${id} mis à jour avec succès.`,
+      message: `Points mis à jour et action loggée.`,
       changes: this.changes,
     });
 
-    // --- Notification WebSocket ---
-    // Récupérer l'instance du serveur WebSocket
+    // Notification WebSocket
     const wss = req.app.get("wss");
-    // Préparer le message de notification
     const notification = {
       type: "scores-updated",
       payload: { userId: id, points },
     };
-    // Envoyer la notification à TOUS les clients connectés
     wss.clients.forEach((client) => {
-      // On vérifie que le client est prêt à recevoir des messages
       if (client.readyState === client.OPEN) {
         client.send(JSON.stringify(notification));
       }
@@ -174,6 +186,21 @@ const getTopPlayers = (req, res, next) => {
   });
 };
 
+const getRecentLogs = (req, res, next) => {
+  // On joint les tables pour récupérer la couleur de l'équipe du joueur cible
+  const sql = `
+    SELECT l.id, l.prenom_cible, l.nom_cible, l.montant, u.couleur_equipe
+    FROM logs l
+    LEFT JOIN utilisateurs u ON l.nom_cible = u.nom AND l.prenom_cible = u.prenom
+    ORDER BY l.id DESC
+    LIMIT 5
+  `;
+  db.all(sql, [], (err, rows) => {
+    if (err) return next(err);
+    res.json({ message: "Logs récupérés", data: rows });
+  });
+};
+
 module.exports = {
   getAllUsers,
   createUser,
@@ -183,4 +210,5 @@ module.exports = {
   getTeamPoints,
   getAllItems,
   getTopPlayers,
+  getRecentLogs,
 };

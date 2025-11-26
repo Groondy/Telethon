@@ -91,8 +91,29 @@ const db = new sqlite3.Database("./api.db", (err) => {
           }
         );
       });
+      
+      db.run(
+        `CREATE TABLE IF NOT EXISTS logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            prenom_cible TEXT,
+            nom_cible TEXT,
+            admin TEXT,
+            item TEXT,
+            montant REAL,
+            received_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`,
+        (err) => {
+          if (err) {
+            console.error("Erreur lors de la création de la table 'logs'", err.message);
+          } else {
+            console.log("Table 'logs' prête.");
+          }
+        }
+      );
 
     });
+    
+    
   }
 });
 

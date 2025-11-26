@@ -24,18 +24,18 @@
           />
         </div>
         <div class="form-group">
-          <label for="couleur_equipe">Couleur d'équipe:</label>
+          <label for="couleur_equipe">Équipe:</label>
           <select
             id="couleur_equipe"
             v-model="couleur_equipe"
             required
             class="form-control"
           >
-            <option disabled value="">Choisir une couleur</option>
-            <option>Bleu</option>
-            <option>Rouge</option>
-            <option>Vert</option>
-            <option>Jaune</option>
+            <option disabled value="">Choisir une équipe</option>
+            <option value="Bleu">Les Légionnaires</option>
+            <option value="Rouge">Les Charleston</option>
+            <option value="Vert">Les Grrrrrrr</option>
+            <option value="Jaune">Les Templiers</option>
           </select>
         </div>
         <div class="form-actions">

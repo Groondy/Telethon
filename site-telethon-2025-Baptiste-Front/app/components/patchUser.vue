@@ -30,17 +30,17 @@
                 />
               </div>
               <div class="form-group">
-                <label for="couleur_equipe">Couleur d'équipe:</label>
+                <label for="couleur_equipe">Équipe :</label>
                 <select
                   id="couleur_equipe"
                   v-model="editableUser.couleur_equipe"
                   required
                   class="form-control"
                 >
-                  <option>Bleu</option>
-                  <option>Rouge</option>
-                  <option>Vert</option>
-                  <option>Jaune</option>
+                  <option value="Bleu">Les Légionnaires</option>
+                  <option value="Rouge">Les Charleston</option>
+                  <option value="Vert">Les Grrrrrrr</option>
+                  <option value="Jaune">Les Templiers</option>
                 </select>
               </div>
             </div>

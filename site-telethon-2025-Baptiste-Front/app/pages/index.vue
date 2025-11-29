@@ -67,7 +67,6 @@
                 <tr>
                   <th>Rang</th>
                   <th>Nom</th>
-                  <th>Équipe</th>
                   <th>Points</th>
                 </tr>
               </thead>
@@ -75,16 +74,12 @@
                 <tr
                   v-for="(player, index) in paginatedPlayers"
                   :key="player.id"
+                  :class="`team-bg-${player.couleur_equipe.toLowerCase()}`"
                 >
                   <td data-label="Rang">
                     {{ (currentPage - 1) * itemsPerPage + index + 1 }}
                   </td>
                   <td data-label="Nom">{{ player.prenom }} {{ player.nom }}</td>
-                  <td data-label="Équipe">
-                    {{
-                      teamNames[player.couleur_equipe] || player.couleur_equipe
-                    }}
-                  </td>
                   <td data-label="Points">{{ player.points }}</td>
                 </tr>
               </tbody>
@@ -126,6 +121,40 @@ const teamNames: Record<string, string> = {
   Rouge: "Les Charleston",
   Vert: "Les Grrrrrrr",
   Jaune: "Les Templiers",
+};
+
+const teamColors: Record<string, { bg: string; border: string; text: string }> =
+  {
+    Bleu: { bg: "#bfdbfe", border: "#93c5fd", text: "#1e40af" },
+    Rouge: { bg: "#fecaca", border: "#fca5a5", text: "#b91c1c" },
+    Vert: { bg: "#bbf7d0", border: "#86efac", text: "#166534" },
+    Jaune: { bg: "#fef08a", border: "#fde047", text: "#a16207" },
+  };
+
+const teamColorsDark: Record<
+  string,
+  { bg: string; border: string; text: string }
+> = {
+  Bleu: {
+    bg: "rgba(59, 130, 246, 0.2)",
+    border: "rgba(59, 130, 246, 0.5)",
+    text: "#dbeafe",
+  },
+  Rouge: {
+    bg: "rgba(239, 68, 68, 0.2)",
+    border: "rgba(239, 68, 68, 0.5)",
+    text: "#fee2e2",
+  },
+  Vert: {
+    bg: "rgba(34, 197, 94, 0.2)",
+    border: "rgba(34, 197, 94, 0.5)",
+    text: "#dcfce7",
+  },
+  Jaune: {
+    bg: "rgba(234, 179, 8, 0.2)",
+    border: "rgba(234, 179, 8, 0.5)",
+    text: "#fef9c3",
+  },
 };
 // Interface pour les scores d'équipe (Existante)
 interface TeamScore {
@@ -232,6 +261,30 @@ onUnmounted(() => {
 @use "~/assets/scss/variables" as *;
 @use "~/assets/scss/buttons";
 @use "sass:map";
+
+// Définition de la carte de couleurs pour le mode sombre, directement en SASS
+$team-colors-dark: (
+  "bleu": (
+    bg: rgba(59, 130, 246),
+    border: rgba(59, 130, 246),
+    text: #ffffff,
+  ),
+  "rouge": (
+    bg: rgba(239, 68, 68),
+    border: rgba(239, 68, 68),
+    text: #ffffff,
+  ),
+  "vert": (
+    bg: rgba(34, 197, 94),
+    border: rgba(34, 197, 94),
+    text: #ffffff,
+  ),
+  "jaune": (
+    bg: rgba(234, 179, 8),
+    border: rgba(234, 179, 8),
+    text: #ffffff,
+  ),
+);
 
 .home-wrapper {
   background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
@@ -581,6 +634,18 @@ onUnmounted(() => {
       text-align: left;
       font-weight: 600;
       color: $gray-300;
+    }
+
+    // Application des couleurs de fond pour chaque équipe sur mobile
+    @each $name, $props in $team-colors-dark {
+      // Appliquer la couleur de l'équipe uniquement si la ligne n'est pas une ligne de podium
+      tr.team-bg-#{$name}:not(.podium-1):not(.podium-2):not(.podium-3) {
+        & {
+          background-color: map.get($props, bg);
+          border-color: map.get($props, border);
+          color: map.get($props, text);
+        }
+      }
     }
 
     /* Spécifiquement pour la cellule du rang, pour s'assurer de l'alignement */

@@ -1,9 +1,11 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
   try {
     // 1. Appeler l'API externe pour récupérer la liste de tous les utilisateurs.
     // Je suppose que ce point d'API est public. S'il nécessite une authentification,
     // il faudra ajouter la logique de token comme dans les autres appels.
-    const usersResponse = await $fetch('http://localhost:3001/api/utilisateurs/points/equipes', {
+    const usersResponse = await $fetch(`${apiUrl}/api/utilisateurs/points/equipes`, {
       method: 'GET',
     })
 

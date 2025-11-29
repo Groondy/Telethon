@@ -1,4 +1,6 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
   // 1. Protéger la route
   await requireUserSession(event)
 
@@ -17,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 4. Appeler l'API externe pour mettre à jour l'utilisateur
-    const updatedUser = await $fetch(`http://localhost:3001/api/utilisateurs/${userId}`, {
+    const updatedUser = await $fetch(`${apiUrl}/api/utilisateurs/${userId}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,

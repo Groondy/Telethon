@@ -1,4 +1,6 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
   // 1. Protéger la route et s'assurer que l'admin est connecté
   await requireUserSession(event)
 
@@ -15,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 4. Appeler l'API externe pour supprimer l'utilisateur
-    await $fetch(`http://localhost:3001/api/utilisateurs/${userId}`, {
+    await $fetch(`${apiUrl}/api/utilisateurs/${userId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,

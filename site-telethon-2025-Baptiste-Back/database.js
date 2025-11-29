@@ -28,8 +28,6 @@ const db = new sqlite3.Database("./api.db", (err) => {
           }
         }
       );
-      
-      
 
       db.run(
         `CREATE TABLE IF NOT EXISTS administrateurs (
@@ -49,49 +47,46 @@ const db = new sqlite3.Database("./api.db", (err) => {
           }
         }
       );
-      
-      db.run("DROP TABLE IF EXISTS item", (err) => {
-        if (err) {
-          return console.error("Erreur lors de la suppression de la table 'item'", err.message);
-        }
-        
-        console.log("Table 'item' existante supprimée.");
 
-        db.run(
-          `CREATE TABLE item (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              nom TEXT NOT NULL,
-              pointsMin INTEGER,
-              prix INTEGER NOT NULL,
-              pointsMax INTEGER
-          )`,
-          (err) => {
-            if (err) {
-              return console.error("Erreur lors de la création de la table 'item'", err.message);
-            }
-            
-            console.log("Table 'item' recréée.");
-            const stmt = db.prepare("INSERT INTO item (nom, prix, pointsMin, pointsMax) VALUES (?, ?, ?, ?)");
-            
-            const items = [
-              { nom: "Gaufre", prix: 5, pointsMin: 20, pointsMax: 100 },
-              { nom: "Crêpe", prix: 3, pointsMin: 10, pointsMax: 50 },
-              { nom: "Tombola", prix: 10, pointsMin: 100, pointsMax: 1000 },
-            ];
-            
-            items.forEach(item => stmt.run(item.nom, item.prix, item.pointsMin, item.pointsMax));
-            
-            stmt.finalize((err) => {
-              if (err) {
-                console.error("Erreur lors de l'insertion des items de base", err.message);
-              } else {
-                console.log("Items de base insérés avec succès.");
-              }
-            });
+      db.run(
+        `CREATE TABLE IF NOT EXISTS item (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nom TEXT NOT NULL,
+            pointsMin INTEGER,
+            prix INTEGER NOT NULL,
+            pointsMax INTEGER
+        )`,
+        (err) => {
+          if (err) {
+            return console.error(
+              "Erreur lors de la création de la table 'item'",
+              err.message
+            );
           }
-        );
-      });
-      
+          console.log("Table 'item' prête.");
+          // On insère les items de base uniquement si la table est vide
+          db.get("SELECT COUNT(id) as count FROM item", (err, row) => {
+            if (err) return;
+            if (row.count === 0) {
+              console.log("Insertion des items de base...");
+              const stmt = db.prepare(
+                "INSERT INTO item (nom, prix, pointsMin, pointsMax) VALUES (?, ?, ?, ?)"
+              );
+              const items = [
+                { nom: "Gaufre", prix: 5, pointsMin: 20, pointsMax: 100 },
+                { nom: "Crêpe", prix: 3, pointsMin: 10, pointsMax: 50 },
+                { nom: "Tombola", prix: 10, pointsMin: 100, pointsMax: 1000 },
+              ];
+              items.forEach((item) =>
+                stmt.run(item.nom, item.prix, item.pointsMin, item.pointsMax)
+              );
+              stmt.finalize();
+              console.log("Items de base insérés.");
+            }
+          });
+        }
+      );
+
       db.run(
         `CREATE TABLE IF NOT EXISTS logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,16 +99,16 @@ const db = new sqlite3.Database("./api.db", (err) => {
         )`,
         (err) => {
           if (err) {
-            console.error("Erreur lors de la création de la table 'logs'", err.message);
+            console.error(
+              "Erreur lors de la création de la table 'logs'",
+              err.message
+            );
           } else {
             console.log("Table 'logs' prête.");
           }
         }
       );
-
     });
-    
-    
   }
 });
 

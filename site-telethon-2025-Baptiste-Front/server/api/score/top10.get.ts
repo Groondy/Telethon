@@ -1,8 +1,10 @@
 // server/api/score/top10.get.ts
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
   try {
     // 1. Appeler l'API externe pour récupérer le top 10
-    const topPlayersResponse = await $fetch('http://localhost:3001/api/utilisateurs/points/top10', {
+    const topPlayersResponse = await $fetch(`${apiUrl}/api/utilisateurs/points/top10`, {
       method: 'GET',
     })
 

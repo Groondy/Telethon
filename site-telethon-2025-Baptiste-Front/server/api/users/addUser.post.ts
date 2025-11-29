@@ -1,4 +1,6 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
   // 1. Protéger la route et s'assurer que l'admin est connecté
   await requireUserSession(event)
 
@@ -20,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 4. Appeler l'API externe pour créer le nouvel utilisateur
-    const newUser = await $fetch('http://localhost:3001/api/utilisateurs', {
+    const newUser = await $fetch(`${apiUrl}/api/utilisateurs`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

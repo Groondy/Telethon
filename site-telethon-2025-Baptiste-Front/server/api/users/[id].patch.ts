@@ -1,4 +1,6 @@
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
   // 1. Protéger la route
   await requireUserSession(event)
 
@@ -23,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // 4. Appeler l'API externe (Backend Express sur le port 3001)
-    const updatedUser = await $fetch(`http://localhost:3001/api/utilisateurs/${userId}/points`, {
+    const updatedUser = await $fetch(`${apiUrl}/api/utilisateurs/${userId}/points`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,

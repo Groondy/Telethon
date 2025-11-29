@@ -2,6 +2,8 @@ export default defineEventHandler(async (event) => {
   // 1. Récupérer l'URL de base de l'API depuis la configuration
   const body = await readBody(event)
   const { nom, prenom, password} = body
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
 
   if (!nom || !prenom || !password) {
     throw createError({
@@ -12,7 +14,7 @@ export default defineEventHandler(async (event) => {
   try {
     // 2. Appeler l'API externe avec les identifiants
     // On suppose que l'API externe retourne les données de l'utilisateur en cas de succès
-    const backendResponse = await $fetch('http://localhost:3001/api/admins/login', {
+    const backendResponse = await $fetch(`${apiUrl}/api/admins/login`, {
       method: 'POST',
       body: {
         nom,
@@ -26,7 +28,6 @@ export default defineEventHandler(async (event) => {
     // 3. Créer la session utilisateur avec nuxt-auth-utils
     // Assurez-vous que l'objet `user` contient les informations que vous voulez dans la session
     await setUserSession(event, { user, token })
-
     return {user}
   }
   catch (error: any) {

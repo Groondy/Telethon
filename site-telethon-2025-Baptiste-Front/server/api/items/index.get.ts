@@ -1,8 +1,10 @@
 // server/api/items/index.get.ts
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
   try {
     // 1. Appeler l'API externe pour récupérer les items
-    const itemsResponse = await $fetch('http://localhost:3001/api/utilisateurs/items', {
+    const itemsResponse = await $fetch(`${apiUrl}/api/utilisateurs/items`, {
       method: 'GET',
     })
 

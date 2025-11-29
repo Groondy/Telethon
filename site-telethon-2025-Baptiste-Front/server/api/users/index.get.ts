@@ -1,13 +1,11 @@
 export default defineEventHandler(async (event) => {
-  // 1. Protéger la route et s'assurer que l'utilisateur est connecté
-  await requireUserSession(event)
+  const config = useRuntimeConfig(event);
+  const apiUrl = config.public.apiUrl;
 
-  // 2. Récupérer le token de la session
-  const session = await getUserSession(event)
   try {
     // 3. Appeler l'API externe pour récupérer la liste des utilisateurs
     // On suppose que l'API externe attend un token Bearer pour l'authentification
-    const users = await $fetch('http://localhost:3001/api/utilisateurs', {
+    const users = await $fetch(`${apiUrl}/api/utilisateurs`, {
       method: 'GET',
     })
 

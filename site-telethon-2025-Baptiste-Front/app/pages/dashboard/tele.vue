@@ -384,7 +384,7 @@ h3 {
 /* --- Images --- */
 .qr-img {
   max-width: 100%;
-  max-height: 250px;
+  max-height: 350px;
   object-fit: contain;
   border-radius: 16px;
   border: 6px solid white;
@@ -396,11 +396,11 @@ h3 {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 .main-logo {
-  max-height: 200px;
+  max-height: 300px;
   object-fit: contain;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
   position: relative;
-  top: -100px;
+  top: -50px;
 }
 
 /* Top 10 */
@@ -462,6 +462,7 @@ h3 {
   justify-content: space-around;
   align-items: center;
   margin-top: -2rem;
+  margin-left: -5px;
 }
 .team-logo {
   height: 150px;
